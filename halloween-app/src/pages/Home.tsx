@@ -35,7 +35,7 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               {/* TODO : Implement secure login */}
               <Button 
-                onClick={() => window.location.href = '/login'}
+                onClick={() => window.location.href = '/auth'}
                 className="bg-primary hover:bg-primary/90 text-primary-foreground text-xl h-14 px-8 rounded-full font-bold shadow-[0_0_20px_rgba(255,107,0,0.4)] animate-pulse-slow"
               >
                 <Ghost className="mr-2 w-6 h-6" />
