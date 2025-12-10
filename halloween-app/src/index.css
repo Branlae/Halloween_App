@@ -1,3 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 270 50% 10%; /* dark purple */
+  --foreground: 0 0% 98%;
+  --card: 270 50% 20%;
+  --card-foreground: 0 0% 100%;
+  --primary: 25 95% 53%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 240 5% 65%;
+  --secondary-foreground: 0 0% 100%;
+  --accent: 291 62% 55%;
+  --accent-foreground: 0 0% 100%;
+  --muted: 240 5% 22%;
+  --muted-foreground: 240 5% 64%;
+  --border: 240 10% 14%;
+}
+
 body {
   margin: 0;
   font-family: Arial, sans-serif;
@@ -8,3 +28,4 @@ button {
   font-size: 1rem;
   cursor: pointer;
 }
+
