@@ -1,14 +1,22 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Ghost, Map as MapIcon, User, Menu, LogOut } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "../components/ui/sheet";
 import { useState } from "react";
-/*import { useAuth } from "../hooks/useAuth";*/
+import { useAuth } from "../hooks/useAuth";
+import { supabase } from "../lib/supabaseClient";
 
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation().pathname;
-  /*const { isAuthenticated } = useAuth();*/
+  const { isAuthenticated, user, loading } = useAuth();
+  const navigate = useNavigate();
+
+  if (loading) {
+    return (
+      <nav className="sticky top-0 z-50 w-full border-b border-white/10 bg-background/80 backdrop-blur-md h-16" />
+    );
+  }
 
   const NavLink = ({
     to,
@@ -53,22 +61,29 @@ export function Header() {
             Trouver des Bonbons
           </NavLink>
 
-          {/* TODO : Implement secure login */}
-          {/* isAuthenticated && <NavLink to="/dashboard" icon={User}>Mon Repaire</NavLink>}
-            {isAuthenticated ? (
-              <Button 
-                variant="outline" 
-                className="border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground font-bold"
-                onClick={() => window.location.href = '/api/logout'}
-              >
-                <LogOut className="mr-2 w-4 h-4" />
-                Déconnexion
-              </Button>
-            ) : */ (
-            <Button 
-              variant="outline" 
+          {isAuthenticated && (
+            <NavLink to="/dashboard" icon={User}>
+              Mon Repaire
+            </NavLink>
+          )}
+
+          {isAuthenticated ? (
+            <Button
+              variant="outline"
               className="border-primary text-primary hover:bg-primary hover:text-primary-foreground font-bold"
-              onClick={() => window.location.href = 'auth'}
+              onClick={async () => {
+                await supabase.auth.signOut();
+                setTimeout(() => navigate("/"), 150);
+              }}
+            >
+              <LogOut className="mr-2 w-4 h-4" />
+              Déconnexion
+            </Button>
+          ) : (
+            <Button
+              variant="outline"
+              className="border-primary text-primary hover:bg-primary hover:text-primary-foreground font-bold"
+              onClick={() => navigate("/auth")}
             >
               Connexion / Rejoindre
             </Button>
@@ -97,22 +112,29 @@ export function Header() {
                   Trouver des Bonbons
                 </NavLink>
 
-                {/* {isAuthenticated && <NavLink to="/dashboard" icon={User}>Mon Repaire</NavLink>}
+                {isAuthenticated && (
+                <NavLink to="/dashboard" icon={User}>
+                  Mon Repaire
+                </NavLink>
+                )}
                 {isAuthenticated ? (
-                  <Button 
-                    className="w-full bg-destructive text-destructive-foreground hover:bg-destructive/90 font-bold mt-4"
-                    onClick={() => window.location.href = '/api/logout'}
-                  >
-                    <LogOut className="mr-2 w-4 h-4" />
-                    Déconnexion
-                  </Button>
-                ) : */ (
-                  <Button 
-                    className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-bold mt-4"
-                    onClick={() => window.location.href = '/auth'}
-                  >
-                    Connexion / Rejoindre
-                  </Button>
+                <Button
+                  className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-bold mt-4"
+                  onClick={async () => {
+                    await supabase.auth.signOut();
+                    setTimeout(() => navigate("/"), 150);
+                  }}
+                >
+                  <LogOut className="mr-2 w-4 h-4" />
+                  Déconnexion
+                </Button>
+                ) : (
+                <Button
+                  className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-bold mt-4"
+                  onClick={() => navigate("/auth")}
+                >
+                  Connexion / Rejoindre
+                </Button>
                 )}
               </div>
             </SheetContent>

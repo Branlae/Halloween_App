@@ -29,11 +29,10 @@ export default function Home() {
               Des Bonbons ou un Sort ?
             </h1>
             <p className="text-xl md:text-2xl text-white max-w-2xl mx-auto mb-8 font-light drop-shadow-md">
-              Trouvez les meilleurs endroits pour les bonbons dans votre quartier, ou afficher votre maison que les fantômes et gobelins sachent que vous participez cet halloween!
+              Trouvez les meilleurs endroits pour les bonbons dans votre quartier, ou afficher votre maison pour que les fantômes et les gobelins sachent que vous participez cet halloween!
             </p>
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              {/* TODO : Implement secure login */}
               <Button 
                 onClick={() => window.location.href = '/auth'}
                 className="bg-primary hover:bg-primary/90 text-primary-foreground text-xl h-14 px-8 rounded-full font-bold shadow-[0_0_20px_rgba(255,107,0,0.4)] animate-pulse-slow"

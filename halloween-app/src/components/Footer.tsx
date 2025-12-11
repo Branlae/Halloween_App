@@ -2,7 +2,7 @@ import { Ghost } from "lucide-react";
 
 export function Footer() {
   return (
-    <footer className="w-full border-t border-white/10 bg-black/20 py-8 mt-auto">
+    <footer className="w-full border-t border-black/10 bg-black/90 py-8 mt-auto">
       <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
         <div className="flex items-center gap-2 text-muted-foreground">
           <Ghost className="h-4 w-4" />
