@@ -6,7 +6,7 @@ export function Footer() {
       <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
         <div className="flex items-center gap-2 text-muted-foreground">
           <Ghost className="h-4 w-4" />
-          <span className="text-sm">© 2024 CarteFrayeur. Restez effrayants.</span>
+          <span className="text-sm">© 2025 CarteFrayeur. Restez effrayants.</span>
         </div>
         
         <div className="flex gap-6 text-sm text-muted-foreground">

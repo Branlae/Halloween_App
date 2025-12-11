@@ -9,7 +9,7 @@ import { supabase } from "../lib/supabaseClient";
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation().pathname;
-  const { isAuthenticated, user, loading } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
   const navigate = useNavigate();
 
   if (loading) {

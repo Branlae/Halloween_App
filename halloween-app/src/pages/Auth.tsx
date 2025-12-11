@@ -43,30 +43,44 @@ export default function AuthPage() {
 
         if (error) throw error;
 
+        // check if signup profile data is stored
+        const pending = localStorage.getItem("pendingProfile");
+
+        if (pending) {
+          const profile = JSON.parse(pending);
+          const { data: authData } = await supabase.auth.getUser();
+
+          if (!authData.user) {
+            throw new Error("User not found after login");
+          }
+
+          await supabase
+            .from("profiles")
+            .update(profile)
+            .eq("id", authData.user.id);
+
+          localStorage.removeItem("pendingProfile");
+        }
+
         navigate("/");
       } else {
         // SIGNUP
-        const { data, error } = await supabase.auth.signUp({
+        const { error } = await supabase.auth.signUp({
           email: form.email,
           password: form.password,
         });
 
         if (error) throw error;
 
-        // Update profile fields (row already created by trigger)
-        if (data.user) {
-          await supabase
-            .from("profiles")
-            .update({
-              first_name: form.firstName,
-              last_name: form.lastName,
-              address: form.address,
-            })
-            .eq("id", data.user.id);
-        }
-        
-        navigate("/");
+        // temporarily store profile data
+        localStorage.setItem("pendingProfile", JSON.stringify({
+          first_name: form.firstName,
+          last_name: form.lastName,
+          address: form.address,
+        }));
+
         alert("Compte créé ! Vérifiez votre email ✉️");
+        navigate("/");
       }
     } catch (err: any) {
       setError(err.message);
@@ -105,16 +119,26 @@ export default function AuthPage() {
 
           {/* Toggle */}
           <div className="flex items-center justify-center gap-4 mb-8">
-            <Button 
-              variant={mode === "login" ? "default" : "outline"} 
+            <Button
+              variant="outline"
+              className={`border-primary font-bold transition-colors
+                ${mode === "login"
+                  ? "text-primary bg-primary text-primary-foreground"
+                  : "text-primary hover:bg-primary hover:text-primary-foreground"
+                }`}
               onClick={() => setMode("login")}
             >
               <LogIn className="w-4 h-4 mr-2" />
               Connexion
             </Button>
 
-            <Button 
-              variant={mode === "signup" ? "default" : "outline"} 
+            <Button
+              variant="outline"
+              className={`border-primary font-bold transition-colors
+                ${mode === "signup"
+                  ? "text-primary bg-primary text-primary-foreground"
+                  : "text-primary hover:bg-primary hover:text-primary-foreground"
+                }`}
               onClick={() => setMode("signup")}
             >
               <UserPlus className="w-4 h-4 mr-2" />
@@ -134,29 +158,29 @@ export default function AuthPage() {
             {mode === "signup" && (
               <>
                 <div>
-                  <Label htmlFor="firstName">Prénom</Label>
+                  <Label htmlFor="firstName" className="text-primary font-bold">Prénom</Label>
                   <Input id="firstName" type="text" onChange={handleChange} required />
                 </div>
 
                 <div>
-                  <Label htmlFor="lastName">Nom</Label>
+                  <Label htmlFor="lastName" className="text-primary font-bold">Nom</Label>
                   <Input id="lastName" type="text" onChange={handleChange} required />
                 </div>
 
                 <div>
-                  <Label htmlFor="address">Adresse</Label>
+                  <Label htmlFor="address" className="text-primary font-bold">Adresse</Label>
                   <Input id="address" type="text" onChange={handleChange} required />
                 </div>
               </>
             )}
 
             <div>
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-primary font-bold">Email</Label>
               <Input id="email" type="email" onChange={handleChange} required />
             </div>
 
             <div>
-              <Label htmlFor="password">Mot de passe</Label>
+              <Label htmlFor="password" className="text-primary font-bold">Mot de passe</Label>
               <Input id="password" type="password" onChange={handleChange} required />
             </div>
 
