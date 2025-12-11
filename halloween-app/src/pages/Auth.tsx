@@ -5,13 +5,78 @@ import { Button } from "../components/ui/button";
 import halloweenHero from "../Halloween_Homepage.png";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
+import { supabase } from "../lib/supabaseClient";
+import { useNavigate } from "react-router-dom";
 
 export default function AuthPage() {
   const [mode, setMode] = useState<"login" | "signup">("login");
+  const navigate = useNavigate();
+
+  // Form state
+  const [form, setForm] = useState({
+    firstName: "",
+    lastName: "",
+    address: "",
+    email: "",
+    password: "",
+  });
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setForm({ ...form, [e.target.id]: e.target.value });
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+
+    try {
+      if (mode === "login") {
+        // LOGIN
+        const { error } = await supabase.auth.signInWithPassword({
+          email: form.email,
+          password: form.password,
+        });
+
+        if (error) throw error;
+
+        navigate("/");
+      } else {
+        // SIGNUP
+        const { data, error } = await supabase.auth.signUp({
+          email: form.email,
+          password: form.password,
+        });
+
+        if (error) throw error;
+
+        // Update profile fields (row already created by trigger)
+        if (data.user) {
+          await supabase
+            .from("profiles")
+            .update({
+              first_name: form.firstName,
+              last_name: form.lastName,
+              address: form.address,
+            })
+            .eq("id", data.user.id);
+        }
+        
+        navigate("/");
+        alert("Compte créé ! Vérifiez votre email ✉️");
+      }
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden">
-      
       {/* Background */}
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/70 to-background z-10" />
@@ -30,19 +95,12 @@ export default function AuthPage() {
           transition={{ duration: 0.6 }}
           className="w-full max-w-lg bg-card/60 backdrop-blur-md border border-white/10 shadow-xl rounded-2xl p-10"
         >
-          
           {/* Title */}
           <div className="text-center mb-8">
             <Ghost className="w-12 h-12 text-primary mx-auto mb-3 animate-bounce-slow" />
             <h1 className="text-4xl font-display text-primary drop-shadow-lg">
               {mode === "login" ? "Connexion" : "Créer un Compte"}
             </h1>
-
-            <p className="text-muted-foreground mt-2">
-              {mode === "login"
-                ? "Ravi de vous revoir !"
-                : "Rejoignez l’aventure des chasseurs de bonbons !"}
-            </p>
           </div>
 
           {/* Toggle */}
@@ -64,58 +122,62 @@ export default function AuthPage() {
             </Button>
           </div>
 
+          {/* Error */}
+          {error && (
+            <div className="text-red-500 text-center mb-4">
+              {error}
+            </div>
+          )}
+
           {/* Form */}
-          <form className="flex flex-col gap-6">
-            
+          <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
             {mode === "signup" && (
               <>
-                {/* First name */}
                 <div>
                   <Label htmlFor="firstName">Prénom</Label>
-                  <Input id="firstName" type="text" placeholder="Votre prénom" required />
+                  <Input id="firstName" type="text" onChange={handleChange} required />
                 </div>
 
-                {/* Last name */}
                 <div>
                   <Label htmlFor="lastName">Nom</Label>
-                  <Input id="lastName" type="text" placeholder="Votre nom" required />
+                  <Input id="lastName" type="text" onChange={handleChange} required />
                 </div>
 
-                {/* Address */}
                 <div>
                   <Label htmlFor="address">Adresse</Label>
-                  <Input id="address" type="text" placeholder="Ex: 123 Rue des Citrouilles" required />
+                  <Input id="address" type="text" onChange={handleChange} required />
                 </div>
               </>
             )}
 
-            {/* Email */}
             <div>
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="email@example.com" required />
+              <Input id="email" type="email" onChange={handleChange} required />
             </div>
 
-            {/* Password */}
             <div>
               <Label htmlFor="password">Mot de passe</Label>
-              <Input id="password" type="password" placeholder="Votre mot de passe" required />
+              <Input id="password" type="password" onChange={handleChange} required />
             </div>
 
             <Button 
-              type="submit" 
+              type="submit"
+              disabled={loading}
               className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-bold h-12 rounded-full shadow-[0_0_20px_rgba(255,107,0,0.4)] mt-4"
             >
-              {mode === "login" ? (
-                <>
-                  <LogIn className="w-5 h-5 mr-2" />
-                  Se Connecter
-                </>
-              ) : (
-                <>
-                  <UserPlus className="w-5 h-5 mr-2" />
-                  Créer un Compte
-                </>
-              )}
+              {loading ? "Chargement..." :
+                mode === "login" ? (
+                  <>
+                    <LogIn className="w-5 h-5 mr-2" />
+                    Se Connecter
+                  </>
+                ) : (
+                  <>
+                    <UserPlus className="w-5 h-5 mr-2" />
+                    Créer un Compte
+                  </>
+                )
+              }
             </Button>
           </form>
 
@@ -132,7 +194,6 @@ export default function AuthPage() {
           </div>
         </motion.div>
       </div>
-
     </div>
   );
 }
